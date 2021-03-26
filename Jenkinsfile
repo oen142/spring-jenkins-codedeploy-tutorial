@@ -26,5 +26,15 @@ pipeline{
                     url: 'git@github.com:oen142/spring-jenkins-codedeploy-tutorial.git'
             }
         }
+
+        stage('S3 Upload'){
+            steps {
+                echo 'S3 Deploy ENV :'
+                sh '''
+                aws s3 sync ./ s3://dreammaker-jenkins-s3/test
+                '''
+            }
+
+        }
     }
 }
