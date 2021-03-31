@@ -32,21 +32,31 @@ pipeline{
     }
 
     stages {
-        stage('SonarQubeScanner'){
-          environment {
-            scannerHome = tool 'SonarQubeScanner'
-          }
+         stage('SonarQube'){
 
-          steps {
+                environment {
+                    scannerHome = tool 'SonarQubeScanner'
+                }
 
-            withSonarQubeEnv('SonarQubeServer') { // Will pick the global server connection you have configured
+                steps {
+                    echo 'SonarQube '
+                    withSonarQubeEnv('SonarQubeServer') { // Will pick the global server connection you have configured
+                        sh "${scannerHome}/bin/sonar-scanner -X"
+                    }
+                }
 
-              sh 'chmod +x ./gradlew'
-              sh './gradlew sonarqube'
+                post {
+                    success {
+                        echo 'Successfully SonarQube'
+                        notifySuccessful('SonarQube')
+                    }
 
+                    failure {
+                        echo 'Fail SonarQube'
+                        notifyFailed('SonarQube')
+                    }
+                }
             }
-          }
-        }
     }
 
 }
