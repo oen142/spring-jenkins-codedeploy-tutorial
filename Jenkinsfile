@@ -16,9 +16,7 @@ def notifyFailed(stage){
 
 pipeline{
     agent any
-    tools {
-        jdk("openJDK11")
-    }
+
     triggers {
         pollSCM('*/3 * * * *')
     }
