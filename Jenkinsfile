@@ -25,6 +25,24 @@ pipeline{
                     branch: 'master',
                     url: 'git@github.com:oen142/spring-jenkins-codedeploy-tutorial.git'
             }
+            post {
+                success {
+                    echo 'successfully clone'
+                    notifyStarted()
+                }
+                always {
+                    echo 'i tired ..'
+                }
+                cleanup {
+                    echo 'after all other post'
+                }
+                failure {
+                    echo 'fail clone'
+                    notifyStarted()
+
+
+                }
+            }
         }
 
         stage('S3 Upload'){
