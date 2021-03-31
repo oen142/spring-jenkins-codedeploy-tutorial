@@ -40,7 +40,7 @@ pipeline{
 
                 steps {
                     echo 'SonarQube '
-                    withSonarQubeEnv('SonarQubeServer') { // Will pick the global server connection you have configured
+                    withSonarQubeEnv('sonarQube') { // Will pick the global server connection you have configured
                         sh "${scannerHome}/bin/sonar-scanner -X"
                     }
                 }
