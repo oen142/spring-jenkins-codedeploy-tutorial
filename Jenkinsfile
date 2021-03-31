@@ -47,6 +47,10 @@ pipeline{
 
         stage('S3 Upload'){
             steps {
+
+                sh '''
+                aws configure list
+                '''
                 echo 'S3 Deploy ENV :'
                 sh '''
                 aws s3 sync ./ s3://dreammaker-jenkins-s3/test
