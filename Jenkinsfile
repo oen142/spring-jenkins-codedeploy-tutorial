@@ -70,7 +70,77 @@ pipeline{
                     echo 'SUCCESSFUL JAVA Build'
                     notifySuccessful('JAVA Build')
                 }
-                failure
+                failure {
+                    echo 'Fail JAVA Build'
+                    notifyFailed('JAVA BUILD Fail')
+                }
+            }
+        }
+
+        stage('SonarQube'){
+            environment {
+                scannerHome = tool 'SonarQubeScanner'
+            }
+
+            steps {
+                echo 'SonarQube '
+                withSonarQubeEnv('SonarQubeServer'){
+                    sh "${scannerHome}/bin/sonar-scanner -X"
+                }
+            }
+
+            post {
+                success {
+                    echo 'Successfully SonarQube'
+                    notifySuccessful('SonarQube Success')
+                }
+
+                failure {
+                    echo 'Fail SonarQube'
+                    notifyFailed('SonarQube')
+                }
+            }
+        }
+
+        stage ('S3 Upload'){
+            steps {
+                dir('./execute'){
+                    sh 'sh ./s3upload.sh'
+                }
+            }
+            post {
+                success {
+                    echo 'SUCCESSFULLY S3 Upload'
+                    notifySuccessful('S3 Upload Success')
+                }
+                failure {
+                    echo 'Fail S3 upload'
+                    notifyFailed('s3 upload fail')
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps{
+                dir('./execute/codeDeploy') {
+                    sh 'sh ./deploy.sh'
+                }
+            }
+            post {
+                success {
+                    echo 'Successfully Deploy'
+                    notifySuccessful('Deploy')
+                }
+                failure {
+                    echo 'Fail Deploy'
+                    notifyFailed('Deploy')
+                }
+            }
+        }
+
+        stage('End'){
+            steps{
+                notifyEnd()
             }
         }
     }
