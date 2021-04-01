@@ -3,15 +3,15 @@ def notifyStarted(){
 }
 
 def notifyEnd(){
-    slackSend (channel: '#cicd', color: '#000000', message: "End: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    slackSend (channel: '#jenkins', color: '#000000', message: "End: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 }
 
 def notifySuccessful(stage){
-    slackSend (channel: '#cicd', color: '#00FF00', message: "SUCCESSFUL ${stage}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    slackSend (channel: '#jenkins', color: '#00FF00', message: "SUCCESSFUL ${stage}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 }
 
 def notifyFailed(stage){
-    slackSend (channel: '#cicd', color: '#FF0000', message: "FAILED ${stage} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    slackSend (channel: '#jenkins', color: '#FF0000', message: "FAILED ${stage} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 }
 
 pipeline{
@@ -32,31 +32,47 @@ pipeline{
     }
 
     stages {
-         stage('SonarQube'){
+        stage('START'){
+            steps {
+                notifyStarted()
+            }
+        }
 
-                environment {
-                    scannerHome = tool 'SonarQubeScanner'
-                }
-
-                steps {
-                    echo 'SonarQube '
-                    withSonarQubeEnv('sonarQube') { // Will pick the global server connection you have configured
-                        sh "${scannerHome}/bin/sonar-scanner -X"
-                    }
-                }
-
-                post {
-                    success {
-                        echo 'Successfully SonarQube'
-                        notifySuccessful('SonarQube')
-                    }
-
-                    failure {
-                        echo 'Fail SonarQube'
-                        notifyFailed('SonarQube')
-                    }
+        stage('JAVA Build Test'){
+            steps {
+                echo 'JAVA Build'
+                dir('./execute'){
+                    sh 'sh ./buildTest.sh'
                 }
             }
+
+            post {
+                success {
+                    echo 'SUCCESSFULLY JAVA Build Test'
+                    notifySuccessful('JAVA Build Test')
+                }
+
+                failure {
+                    echo 'Failed JAVA Build Test'
+                    notifyFailed('JAVA Build Test Failed')
+                }
+            }
+        }
+        stage('JAVA Build'){
+            steps {
+                echo 'JAVA Build'
+                dir ('./execute'){
+                    sh 'sh ./build.sh'
+                }
+            }
+            post {
+                success {
+                    echo 'SUCCESSFUL JAVA Build'
+                    notifySuccessful('JAVA Build')
+                }
+                failure
+            }
+        }
     }
 
 }

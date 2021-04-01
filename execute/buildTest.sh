@@ -3,4 +3,4 @@
 cd ../
 chmod +x ./gradlew
 
-./gradlew sonarqube
+./gradlew clean test
