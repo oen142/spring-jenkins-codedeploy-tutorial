@@ -77,30 +77,6 @@ pipeline{
             }
         }
 
-        stage('SonarQube'){
-            environment {
-                scannerHome = tool 'SonarQubeScanner'
-            }
-
-            steps {
-                echo 'SonarQube '
-                withSonarQubeEnv('SonarQubeServer'){
-                    sh "${scannerHome}/bin/sonar-scanner -X"
-                }
-            }
-
-            post {
-                success {
-                    echo 'Successfully SonarQube'
-                    notifySuccessful('SonarQube Success')
-                }
-
-                failure {
-                    echo 'Fail SonarQube'
-                    notifyFailed('SonarQube')
-                }
-            }
-        }
 
         stage ('S3 Upload'){
             steps {
